@@ -176,6 +176,20 @@
         </div>
     </div>
 
+    <!-- MODAL: EXAME -->
+    <div id="modal-exame" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl">
+            <h2 class="text-2xl font-bold mb-6">Adicionar Exame</h2>
+            <form onsubmit="adicionarExame(event)" class="space-y-4">
+                <input type="text" name="descricao" placeholder="Descrição do Exame" class="w-full p-3 border border-gray-300 rounded-lg text-sm" required>
+                <div class="flex gap-2">
+                    <button type="button" onclick="fecharModal('modal-exame')" class="flex-1 p-3 bg-gray-200 rounded-lg">Cancelar</button>
+                    <button type="submit" class="flex-1 p-3 bg-green-600 text-white rounded-lg font-bold">Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Funções Modais
         function abrirModal(id) {
@@ -222,7 +236,6 @@
                                     </div>
                                 </div>
                                 <div class="flex gap-2">
-                                    <button onclick="editarCliente('${c.id}')" class="text-blue-600 hover:text-blue-800 font-bold text-sm">Editar</button>
                                     <button onclick="deletarCliente('${c.id}')" class="text-red-600 hover:text-red-800 font-bold text-sm">Deletar</button>
                                 </div>
                             </div>
@@ -276,9 +289,6 @@
         // ===== ANIMAIS =====
         async function carregarAnimais() {
             try {
-                const res = await fetch('/animais');
-                if(!res.ok) throw new Error('Erro ao buscar animais');
-                
                 // Como não há endpoint GET /animais, vamos carregar dos clientes
                 const clientesRes = await fetch('/clientes');
                 const clientes = await clientesRes.json();
@@ -296,7 +306,6 @@
                                 </div>
                             </div>
                             <div class="flex gap-2">
-                                <button onclick="editarAnimal('${a.id}')" class="text-blue-600 hover:text-blue-800 font-bold text-sm">Editar</button>
                                 <button onclick="deletarAnimal('${a.id}')" class="text-red-600 hover:text-red-800 font-bold text-sm">Deletar</button>
                             </div>
                         </div>
@@ -367,7 +376,6 @@
                         <p class="text-gray-500 text-sm">${v.endereco_vet}</p>
                         <p class="text-xs text-gray-400 mt-2">${v.consultas?.length || 0} consulta(s)</p>
                         <div class="flex gap-2 mt-4">
-                            <button onclick="editarVeterinario('${v.id}')" class="flex-1 text-blue-600 hover:text-blue-800 font-bold text-sm">Editar</button>
                             <button onclick="deletarVeterinario('${v.id}')" class="flex-1 text-red-600 hover:text-red-800 font-bold text-sm">Deletar</button>
                         </div>
                     </div>
@@ -429,7 +437,6 @@
                                 <p class="text-xs mt-2 bg-blue-100 text-blue-700 px-2 py-1 rounded inline-block">${t.consultas?.length || 0} consulta(s)</p>
                             </div>
                             <div class="flex gap-2">
-                                <button onclick="editarTratamento('${t.id}')" class="text-blue-600 hover:text-blue-800 font-bold text-sm">Editar</button>
                                 <button onclick="deletarTratamento('${t.id}')" class="text-red-600 hover:text-red-800 font-bold text-sm">Deletar</button>
                             </div>
                         </div>
@@ -477,6 +484,8 @@
         }
 
         // ===== CONSULTAS =====
+        let consultaSelecionadaParaExame = null;
+
         async function carregarConsultas() {
             try {
                 const res = await fetch('/consultas');
@@ -494,7 +503,7 @@
                                 <p class="text-xs mt-2 bg-green-100 text-green-700 px-2 py-1 rounded inline-block">${c.exames?.length || 0} exame(s)</p>
                             </div>
                             <div class="flex gap-2">
-                                <button onclick="abrirModal('modal-exame-${c.id}')" class="text-green-600 hover:text-green-800 font-bold text-sm">+ Exame</button>
+                                <button onclick="abrirExameModal('${c.id}')" class="text-green-600 hover:text-green-800 font-bold text-sm">+ Exame</button>
                                 <button onclick="deletarConsulta('${c.id}')" class="text-red-600 hover:text-red-800 font-bold text-sm">Deletar</button>
                             </div>
                         </div>
@@ -507,22 +516,33 @@
                             `).join('') || ''}
                         </div>
                     </div>
-                    <div id="modal-exame-${c.id}" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                        <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl">
-                            <h2 class="text-2xl font-bold mb-6">Adicionar Exame</h2>
-                            <form onsubmit="async(e)=>{e.preventDefault();const desc=e.target.descricao.value;await fetch('/consultas/${c.id}/exames',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({descricao:desc})});fecharModal('modal-exame-${c.id}');carregarConsultas();}" class="space-y-4">
-                                <input type="text" name="descricao" placeholder="Descrição do Exame" class="w-full p-3 border border-gray-300 rounded-lg text-sm" required>
-                                <div class="flex gap-2">
-                                    <button type="button" onclick="fecharModal('modal-exame-${c.id}')" class="flex-1 p-3 bg-gray-200 rounded-lg">Cancelar</button>
-                                    <button type="submit" class="flex-1 p-3 bg-green-600 text-white rounded-lg font-bold">Adicionar</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
                 `).join('');
             } catch(e) {
                 console.error('Erro ao carregar consultas:', e);
             }
+        }
+
+        function abrirExameModal(consultaId) {
+            consultaSelecionadaParaExame = consultaId;
+            abrirModal('modal-exame');
+        }
+
+        function adicionarExame(e) {
+            e.preventDefault();
+            const descricao = document.querySelector('#modal-exame input[name="descricao"]').value;
+            
+            fetch(`/consultas/${consultaSelecionadaParaExame}/exames`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ descricao })
+            }).then(() => {
+                fecharModal('modal-exame');
+                document.querySelector('#modal-exame form').reset();
+                carregarConsultas();
+            }).catch(e => {
+                console.error('Erro:', e);
+                alert('Erro ao adicionar exame');
+            });
         }
 
         document.getElementById('form-consulta').onsubmit = async (e) => {
@@ -569,11 +589,6 @@
 
         // Carregar clientes na inicialização
         carregarClientes();
-    </script>
-</body>
-</html>
-
-        carregar();
     </script>
 </body>
 </html>
