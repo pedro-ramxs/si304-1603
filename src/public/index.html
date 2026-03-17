@@ -5,99 +5,573 @@
     <title>VetSys - Gestão Veterinária</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 pb-10">
-    <nav class="bg-blue-700 p-4 text-white shadow-md mb-8">
+<body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav class="bg-blue-700 p-4 text-white shadow-lg sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-2xl font-bold italic tracking-tighter">🐾 VET-SISTEMA v1.0</h1>
-            <div class="space-x-4">
-                <button onclick="document.getElementById('modal-cliente').classList.toggle('hidden')" class="bg-white text-blue-700 px-4 py-2 rounded-lg font-bold hover:bg-blue-50 transition">+ Novo Cliente</button>
+            <div class="flex gap-2">
+                <button onclick="mostrarTab('tab-clientes')" class="tab-btn bg-white text-blue-700 px-4 py-2 rounded-lg font-bold hover:bg-blue-50">👥 Clientes</button>
+                <button onclick="mostrarTab('tab-animais')" class="tab-btn px-4 py-2 rounded-lg font-bold hover:bg-blue-600">🐾 Animais</button>
+                <button onclick="mostrarTab('tab-veterinarios')" class="tab-btn px-4 py-2 rounded-lg font-bold hover:bg-blue-600">👨‍⚕️ Veterinários</button>
+                <button onclick="mostrarTab('tab-tratamentos')" class="tab-btn px-4 py-2 rounded-lg font-bold hover:bg-blue-600">💊 Tratamentos</button>
+                <button onclick="mostrarTab('tab-consultas')" class="tab-btn px-4 py-2 rounded-lg font-bold hover:bg-blue-600">📋 Consultas</button>
             </div>
         </div>
     </nav>
 
-    <main class="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 px-4">
-        <div class="lg:col-span-2 space-y-4" id="lista-clientes">
+    <main class="container mx-auto px-4 py-8">
+        <!-- TAB: CLIENTES -->
+        <div id="tab-clientes" class="tab-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-gray-800">Gestão de Clientes</h2>
+                <button onclick="abrirModal('modal-cliente')" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700">+ Novo Cliente</button>
             </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div class="lg:col-span-2 space-y-4" id="lista-clientes"></div>
+                <div class="space-y-4">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 text-center">
+                        <h3 class="text-gray-500 uppercase text-xs font-bold tracking-widest mb-2">Total de Clientes</h3>
+                        <span id="total-clientes" class="text-5xl font-black text-blue-600">0</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 text-center">
+                        <h3 class="text-gray-500 uppercase text-xs font-bold tracking-widest mb-2">Total de Pacientes</h3>
+                        <span id="total-pets" class="text-5xl font-black text-green-600">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <div class="space-y-4">
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 text-center">
-                <h3 class="text-gray-500 uppercase text-xs font-bold tracking-widest mb-2">Total de Pacientes</h3>
-                <span id="total-pets" class="text-5xl font-black text-blue-600">0</span>
+        <!-- TAB: ANIMAIS -->
+        <div id="tab-animais" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-gray-800">Gestão de Animais</h2>
+                <button onclick="abrirModal('modal-animal')" class="bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700">+ Novo Animal</button>
             </div>
+            <div class="space-y-4" id="lista-animais"></div>
+        </div>
+
+        <!-- TAB: VETERINÁRIOS -->
+        <div id="tab-veterinarios" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-gray-800">Gestão de Veterinários</h2>
+                <button onclick="abrirModal('modal-veterinario')" class="bg-purple-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-purple-700">+ Novo Veterinário</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="lista-veterinarios"></div>
+        </div>
+
+        <!-- TAB: TRATAMENTOS -->
+        <div id="tab-tratamentos" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-gray-800">Gestão de Tratamentos</h2>
+                <button onclick="abrirModal('modal-tratamento')" class="bg-orange-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-700">+ Novo Tratamento</button>
+            </div>
+            <div class="space-y-4" id="lista-tratamentos"></div>
+        </div>
+
+        <!-- TAB: CONSULTAS -->
+        <div id="tab-consultas" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-gray-800">Gestão de Consultas</h2>
+                <button onclick="abrirModal('modal-consulta')" class="bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-700">+ Nova Consulta</button>
+            </div>
+            <div class="space-y-4" id="lista-consultas"></div>
         </div>
     </main>
 
-    <div id="modal-cliente" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl">
-            <h2 class="text-2xl font-bold mb-6">Cadastrar Novo Cliente</h2>
+    <!-- MODAL: CLIENTE -->
+    <div id="modal-cliente" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl max-h-96 overflow-y-auto">
+            <h2 class="text-2xl font-bold mb-6">Cadastrar Cliente</h2>
             <form id="form-cliente" class="space-y-4">
-                <input type="text" name="nome" placeholder="Nome Completo" class="w-full p-3 border rounded-xl" required>
-                <input type="email" name="email" placeholder="E-mail" class="w-full p-3 border rounded-xl" required>
-                <input type="text" name="telefone" placeholder="Telefone" class="w-full p-3 border rounded-xl" required>
-                <input type="text" name="endereco" placeholder="Endereço" class="w-full p-3 border rounded-xl" required>
+                <input type="text" name="nome" placeholder="Nome Completo" class="w-full p-3 border border-gray-300 rounded-lg text-sm" required>
+                <input type="email" name="email" placeholder="E-mail" class="w-full p-3 border border-gray-300 rounded-lg text-sm" required>
+                <input type="text" name="telefone" placeholder="Telefone" class="w-full p-3 border border-gray-300 rounded-lg text-sm" required>
+                <input type="text" name="endereco" placeholder="Endereço" class="w-full p-3 border border-gray-300 rounded-lg text-sm" required>
+                <input type="hidden" name="cep" value="00000-000">
                 <div class="flex gap-2">
-                    <button type="button" onclick="document.getElementById('modal-cliente').classList.add('hidden')" class="flex-1 p-3 bg-gray-200 rounded-xl">Cancelar</button>
-                    <button type="submit" class="flex-1 p-3 bg-blue-600 text-white rounded-xl font-bold">Salvar</button>
+                    <button type="button" onclick="fecharModal('modal-cliente')" class="flex-1 p-3 bg-gray-200 rounded-lg">Cancelar</button>
+                    <button type="submit" class="flex-1 p-3 bg-blue-600 text-white rounded-lg font-bold">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ANIMAL -->
+    <div id="modal-animal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl max-h-96 overflow-y-auto">
+            <h2 class="text-2xl font-bold mb-6">Cadastrar Animal</h2>
+            <form id="form-animal" class="space-y-4">
+                <input type="text" name="nome" placeholder="Nome do Animal" class="w-full p-3 border border-gray-300 rounded-lg text-sm" required>
+                <input type="number" name="idade" placeholder="Idade" min="0" class="w-full p-3 border border-gray-300 rounded-lg text-sm" required>
+                <select name="sexo" class="w-full p-3 border border-gray-300 rounded-lg text-sm" required>
+                    <option value="">Selecione o Sexo</option>
+                    <option value="1">Macho</option>
+                    <option value="2">Fêmea</option>
+                </select>
+                <select name="clienteId" class="w-full p-3 border border-gray-300 rounded-lg text-sm" required id="select-cliente-animal">
+                    <option value="">Selecione o Cliente</option>
+                </select>
+                <input type="date" name="dataInicioTrat" class="w-full p-3 border border-gray-300 rounded-lg text-sm" required>
+                <div class="flex gap-2">
+                    <button type="button" onclick="fecharModal('modal-animal')" class="flex-1 p-3 bg-gray-200 rounded-lg">Cancelar</button>
+                    <button type="submit" class="flex-1 p-3 bg-green-600 text-white rounded-lg font-bold">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: VETERINÁRIO -->
+    <div id="modal-veterinario" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl max-h-96 overflow-y-auto">
+            <h2 class="text-2xl font-bold mb-6">Cadastrar Veterinário</h2>
+            <form id="form-veterinario" class="space-y-4">
+                <input type="text" name="nome_vet" placeholder="Nome do Veterinário" class="w-full p-3 border border-gray-300 rounded-lg text-sm" required>
+                <input type="text" name="telefone_vet" placeholder="Telefone" class="w-full p-3 border border-gray-300 rounded-lg text-sm" required>
+                <input type="text" name="endereco_vet" placeholder="Endereço" class="w-full p-3 border border-gray-300 rounded-lg text-sm" required>
+                <div class="flex gap-2">
+                    <button type="button" onclick="fecharModal('modal-veterinario')" class="flex-1 p-3 bg-gray-200 rounded-lg">Cancelar</button>
+                    <button type="submit" class="flex-1 p-3 bg-purple-600 text-white rounded-lg font-bold">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: TRATAMENTO -->
+    <div id="modal-tratamento" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl max-h-96 overflow-y-auto">
+            <h2 class="text-2xl font-bold mb-6">Cadastrar Tratamento</h2>
+            <form id="form-tratamento" class="space-y-4">
+                <select name="animalId" class="w-full p-3 border border-gray-300 rounded-lg text-sm" required id="select-animal-tratamento">
+                    <option value="">Selecione o Animal</option>
+                </select>
+                <input type="date" name="dataIni" class="w-full p-3 border border-gray-300 rounded-lg text-sm" required>
+                <textarea name="histInicial" placeholder="Histórico Inicial" class="w-full p-3 border border-gray-300 rounded-lg text-sm" rows="3"></textarea>
+                <div class="flex gap-2">
+                    <button type="button" onclick="fecharModal('modal-tratamento')" class="flex-1 p-3 bg-gray-200 rounded-lg">Cancelar</button>
+                    <button type="submit" class="flex-1 p-3 bg-orange-600 text-white rounded-lg font-bold">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: CONSULTA -->
+    <div id="modal-consulta" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl max-h-96 overflow-y-auto">
+            <h2 class="text-2xl font-bold mb-6">Cadastrar Consulta</h2>
+            <form id="form-consulta" class="space-y-4">
+                <select name="tratamentoId" class="w-full p-3 border border-gray-300 rounded-lg text-sm" required id="select-tratamento-consulta">
+                    <option value="">Selecione o Tratamento</option>
+                </select>
+                <input type="datetime-local" name="data_consulta" class="w-full p-3 border border-gray-300 rounded-lg text-sm" required>
+                <textarea name="historico" placeholder="Histórico da Consulta" class="w-full p-3 border border-gray-300 rounded-lg text-sm" rows="3" required></textarea>
+                <select name="veterinarioId" class="w-full p-3 border border-gray-300 rounded-lg text-sm" id="select-veterinario-consulta">
+                    <option value="">Selecione o Veterinário (opcional)</option>
+                </select>
+                <div class="flex gap-2">
+                    <button type="button" onclick="fecharModal('modal-consulta')" class="flex-1 p-3 bg-gray-200 rounded-lg">Cancelar</button>
+                    <button type="submit" class="flex-1 p-3 bg-red-600 text-white rounded-lg font-bold">Salvar</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
-        const API = ''; // URL base
+        // Funções Modais
+        function abrirModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
 
-        async function carregar() {
-            const res = await fetch('/clientes');
-            const clientes = await res.json();
-            const container = document.getElementById('lista-clientes');
-            let totalPets = 0;
+        function fecharModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function mostrarTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
             
-            container.innerHTML = clientes.map(c => {
-                totalPets += c.animais.length;
-                return `
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-start">
-                        <div>
-                            <h3 class="text-xl font-bold text-gray-800">${c.nome}</h3>
-                            <p class="text-gray-500 text-sm">${c.email} | ${c.telefone}</p>
-                            <div class="mt-4 flex flex-wrap gap-2">
-                                ${c.animais.length > 0 ? c.animais.map(a => `
-                                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-200">
-                                        🐶 ${a.nome} (${a.idade} anos)
-                                    </span>
-                                `).join('') : '<span class="text-gray-400 text-xs italic">Nenhum animal cadastrado</span>'}
+            // Carregar dados da aba
+            if(tabId === 'tab-clientes') carregarClientes();
+            else if(tabId === 'tab-animais') carregarAnimais();
+            else if(tabId === 'tab-veterinarios') carregarVeterinarios();
+            else if(tabId === 'tab-tratamentos') carregarTratamentos();
+            else if(tabId === 'tab-consultas') carregarConsultas();
+        }
+
+        // ===== CLIENTES =====
+        async function carregarClientes() {
+            try {
+                const res = await fetch('/clientes');
+                const clientes = await res.json();
+                const container = document.getElementById('lista-clientes');
+                let totalPets = 0;
+                
+                container.innerHTML = clientes.map(c => {
+                    totalPets += c.animais?.length || 0;
+                    return `
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-bold text-gray-800">${c.nome}</h3>
+                                    <p class="text-gray-500 text-sm">${c.email}</p>
+                                    <p class="text-gray-500 text-sm">${c.telefone} | ${c.endereco}</p>
+                                    <div class="mt-4 flex flex-wrap gap-2">
+                                        ${c.animais?.length ? c.animais.map(a => `
+                                            <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">🐾 ${a.nome}</span>
+                                        `).join('') : '<span class="text-gray-400 text-xs">Sem animais</span>'}
+                                    </div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="editarCliente('${c.id}')" class="text-blue-600 hover:text-blue-800 font-bold text-sm">Editar</button>
+                                    <button onclick="deletarCliente('${c.id}')" class="text-red-600 hover:text-red-800 font-bold text-sm">Deletar</button>
+                                </div>
                             </div>
                         </div>
-                        <button onclick="excluir('${c.id}')" class="text-red-400 hover:text-red-600">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                        </button>
-                    </div>
-                `;
-            }).join('');
-            document.getElementById('total-pets').innerText = totalPets;
+                    `;
+                }).join('');
+                document.getElementById('total-clientes').innerText = clientes.length;
+                document.getElementById('total-pets').innerText = totalPets;
+                
+                // Popular select de clientes
+                const selectCliente = document.getElementById('select-cliente-animal');
+                selectCliente.innerHTML = '<option value="">Selecione o Cliente</option>' + 
+                    clientes.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+            } catch(e) {
+                console.error('Erro ao carregar clientes:', e);
+                alert('Erro ao carregar clientes');
+            }
         }
 
         document.getElementById('form-cliente').onsubmit = async (e) => {
             e.preventDefault();
-            const data = Object.fromEntries(new FormData(e.target));
-            data.cep = "00000-000"; // Campo obrigatório no schema
-            
-            await fetch('/clientes', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            
-            e.target.reset();
-            document.getElementById('modal-cliente').classList.add('hidden');
-            carregar();
+            try {
+                const data = Object.fromEntries(new FormData(e.target));
+                data.cep = "00000-000";
+                
+                await fetch('/clientes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                e.target.reset();
+                fecharModal('modal-cliente');
+                carregarClientes();
+            } catch(e) {
+                console.error('Erro:', e);
+                alert('Erro ao salvar cliente');
+            }
         };
 
-        async function excluir(id) {
-            if(confirm('Deseja excluir este cliente?')) {
-                await fetch(`/clientes/\${id}`, { method: 'DELETE' });
-                carregar();
+        async function deletarCliente(id) {
+            if(!confirm('Deseja excluir este cliente?')) return;
+            try {
+                await fetch(`/clientes/${id}`, { method: 'DELETE' });
+                carregarClientes();
+            } catch(e) {
+                alert('Erro ao deletar cliente');
             }
         }
+
+        // ===== ANIMAIS =====
+        async function carregarAnimais() {
+            try {
+                const res = await fetch('/animais');
+                if(!res.ok) throw new Error('Erro ao buscar animais');
+                
+                // Como não há endpoint GET /animais, vamos carregar dos clientes
+                const clientesRes = await fetch('/clientes');
+                const clientes = await clientesRes.json();
+                const animais = clientes.flatMap(c => c.animais || []);
+                
+                const container = document.getElementById('lista-animais');
+                container.innerHTML = animais.map(a => `
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800">🐾 ${a.nome}</h3>
+                                <p class="text-gray-500 text-sm">Idade: ${a.idade} anos | Sexo: ${a.sexo === 1 ? 'Macho' : 'Fêmea'}</p>
+                                <div class="mt-2 flex gap-2">
+                                    ${a.tratamentos?.length ? `<span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">${a.tratamentos.length} tratamento(s)</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="editarAnimal('${a.id}')" class="text-blue-600 hover:text-blue-800 font-bold text-sm">Editar</button>
+                                <button onclick="deletarAnimal('${a.id}')" class="text-red-600 hover:text-red-800 font-bold text-sm">Deletar</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Popular select de animais
+                const selectAnimal = document.getElementById('select-animal-tratamento');
+                selectAnimal.innerHTML = '<option value="">Selecione o Animal</option>' + 
+                    animais.map(a => `<option value="${a.id}">${a.nome}</option>`).join('');
+            } catch(e) {
+                console.error('Erro ao carregar animais:', e);
+            }
+        }
+
+        document.getElementById('form-animal').onsubmit = async (e) => {
+            e.preventDefault();
+            try {
+                const formData = Object.fromEntries(new FormData(e.target));
+                const data = {
+                    dadosAnimal: {
+                        nome: formData.nome,
+                        idade: parseInt(formData.idade),
+                        sexo: parseInt(formData.sexo),
+                        clienteId: formData.clienteId
+                    },
+                    dataInicioTrat: formData.dataInicioTrat
+                };
+                
+                await fetch('/animais', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                e.target.reset();
+                fecharModal('modal-animal');
+                carregarAnimais();
+                carregarClientes();
+            } catch(e) {
+                console.error('Erro:', e);
+                alert('Erro ao salvar animal');
+            }
+        };
+
+        async function deletarAnimal(id) {
+            if(!confirm('Deseja excluir este animal?')) return;
+            try {
+                await fetch(`/animais/${id}`, { method: 'DELETE' });
+                carregarAnimais();
+                carregarClientes();
+            } catch(e) {
+                alert('Erro ao deletar animal');
+            }
+        }
+
+        // ===== VETERINÁRIOS =====
+        async function carregarVeterinarios() {
+            try {
+                const res = await fetch('/veterinarios');
+                const veterinarios = await res.json();
+                const container = document.getElementById('lista-veterinarios');
+                
+                container.innerHTML = veterinarios.map(v => `
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-800">👨‍⚕️ ${v.nome_vet}</h3>
+                        <p class="text-gray-500 text-sm mt-2">${v.telefone_vet}</p>
+                        <p class="text-gray-500 text-sm">${v.endereco_vet}</p>
+                        <p class="text-xs text-gray-400 mt-2">${v.consultas?.length || 0} consulta(s)</p>
+                        <div class="flex gap-2 mt-4">
+                            <button onclick="editarVeterinario('${v.id}')" class="flex-1 text-blue-600 hover:text-blue-800 font-bold text-sm">Editar</button>
+                            <button onclick="deletarVeterinario('${v.id}')" class="flex-1 text-red-600 hover:text-red-800 font-bold text-sm">Deletar</button>
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Popular select
+                const selectVet = document.getElementById('select-veterinario-consulta');
+                selectVet.innerHTML = '<option value="">Selecione o Veterinário (opcional)</option>' + 
+                    veterinarios.map(v => `<option value="${v.id}">${v.nome_vet}</option>`).join('');
+            } catch(e) {
+                console.error('Erro ao carregar veterinários:', e);
+            }
+        }
+
+        document.getElementById('form-veterinario').onsubmit = async (e) => {
+            e.preventDefault();
+            try {
+                const data = Object.fromEntries(new FormData(e.target));
+                
+                await fetch('/veterinarios', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                e.target.reset();
+                fecharModal('modal-veterinario');
+                carregarVeterinarios();
+            } catch(e) {
+                console.error('Erro:', e);
+                alert('Erro ao salvar veterinário');
+            }
+        };
+
+        async function deletarVeterinario(id) {
+            if(!confirm('Deseja excluir este veterinário?')) return;
+            try {
+                await fetch(`/veterinarios/${id}`, { method: 'DELETE' });
+                carregarVeterinarios();
+            } catch(e) {
+                alert('Erro ao deletar veterinário');
+            }
+        }
+
+        // ===== TRATAMENTOS =====
+        async function carregarTratamentos() {
+            try {
+                const res = await fetch('/tratamentos');
+                const tratamentos = await res.json();
+                const container = document.getElementById('lista-tratamentos');
+                
+                container.innerHTML = tratamentos.map(t => `
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">💊 ${t.nome_tratamento || 'Tratamento'}</h3>
+                                <p class="text-gray-500 text-sm mt-1">Início: ${new Date(t.data_inicial).toLocaleDateString('pt-br')}</p>
+                                ${t.data_final ? `<p class="text-gray-500 text-sm">Fim: ${new Date(t.data_final).toLocaleDateString('pt-br')}</p>` : '<p class="text-gray-400 text-sm">Ativo</p>'}
+                                <p class="text-xs mt-2 bg-blue-100 text-blue-700 px-2 py-1 rounded inline-block">${t.consultas?.length || 0} consulta(s)</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="editarTratamento('${t.id}')" class="text-blue-600 hover:text-blue-800 font-bold text-sm">Editar</button>
+                                <button onclick="deletarTratamento('${t.id}')" class="text-red-600 hover:text-red-800 font-bold text-sm">Deletar</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Popular select
+                const selectTrat = document.getElementById('select-tratamento-consulta');
+                selectTrat.innerHTML = '<option value="">Selecione o Tratamento</option>' + 
+                    tratamentos.map(t => `<option value="${t.id}">${t.nome_tratamento || 'Tratamento'} - ${new Date(t.data_inicial).toLocaleDateString('pt-br')}</option>`).join('');
+            } catch(e) {
+                console.error('Erro ao carregar tratamentos:', e);
+            }
+        }
+
+        document.getElementById('form-tratamento').onsubmit = async (e) => {
+            e.preventDefault();
+            try {
+                const data = Object.fromEntries(new FormData(e.target));
+                data.dataIni = data.dataIni + 'T00:00:00Z';
+                
+                await fetch('/tratamentos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                e.target.reset();
+                fecharModal('modal-tratamento');
+                carregarTratamentos();
+            } catch(e) {
+                console.error('Erro:', e);
+                alert('Erro ao salvar tratamento');
+            }
+        };
+
+        async function deletarTratamento(id) {
+            if(!confirm('Deseja excluir este tratamento?')) return;
+            try {
+                await fetch(`/tratamentos/${id}`, { method: 'DELETE' });
+                carregarTratamentos();
+            } catch(e) {
+                alert('Erro ao deletar tratamento');
+            }
+        }
+
+        // ===== CONSULTAS =====
+        async function carregarConsultas() {
+            try {
+                const res = await fetch('/consultas');
+                const consultas = await res.json();
+                const container = document.getElementById('lista-consultas');
+                
+                container.innerHTML = consultas.map(c => `
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-800">📋 Consulta</h3>
+                                <p class="text-gray-500 text-sm mt-1">Data: ${new Date(c.data_consulta).toLocaleString('pt-br')}</p>
+                                <p class="text-gray-600 text-sm mt-2">${c.historico}</p>
+                                ${c.veterinario ? `<p class="text-xs mt-2 bg-purple-100 text-purple-700 px-2 py-1 rounded inline-block">👨‍⚕️ ${c.veterinario.nome_vet}</p>` : ''}
+                                <p class="text-xs mt-2 bg-green-100 text-green-700 px-2 py-1 rounded inline-block">${c.exames?.length || 0} exame(s)</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="abrirModal('modal-exame-${c.id}')" class="text-green-600 hover:text-green-800 font-bold text-sm">+ Exame</button>
+                                <button onclick="deletarConsulta('${c.id}')" class="text-red-600 hover:text-red-800 font-bold text-sm">Deletar</button>
+                            </div>
+                        </div>
+                        <div class="mt-4 space-y-2" id="exames-${c.id}">
+                            ${c.exames?.map(ex => `
+                                <div class="bg-gray-50 p-3 rounded border border-gray-200 flex justify-between items-center">
+                                    <span class="text-sm text-gray-700">🧪 ${ex.desc_exame}</span>
+                                    <button onclick="deletarExame('${ex.id}')" class="text-red-600 hover:text-red-800 text-sm font-bold">Remover</button>
+                                </div>
+                            `).join('') || ''}
+                        </div>
+                    </div>
+                    <div id="modal-exame-${c.id}" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                        <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl">
+                            <h2 class="text-2xl font-bold mb-6">Adicionar Exame</h2>
+                            <form onsubmit="async(e)=>{e.preventDefault();const desc=e.target.descricao.value;await fetch('/consultas/${c.id}/exames',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({descricao:desc})});fecharModal('modal-exame-${c.id}');carregarConsultas();}" class="space-y-4">
+                                <input type="text" name="descricao" placeholder="Descrição do Exame" class="w-full p-3 border border-gray-300 rounded-lg text-sm" required>
+                                <div class="flex gap-2">
+                                    <button type="button" onclick="fecharModal('modal-exame-${c.id}')" class="flex-1 p-3 bg-gray-200 rounded-lg">Cancelar</button>
+                                    <button type="submit" class="flex-1 p-3 bg-green-600 text-white rounded-lg font-bold">Adicionar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                `).join('');
+            } catch(e) {
+                console.error('Erro ao carregar consultas:', e);
+            }
+        }
+
+        document.getElementById('form-consulta').onsubmit = async (e) => {
+            e.preventDefault();
+            try {
+                const data = Object.fromEntries(new FormData(e.target));
+                if(!data.veterinarioId) delete data.veterinarioId;
+                
+                await fetch('/consultas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                e.target.reset();
+                fecharModal('modal-consulta');
+                carregarConsultas();
+                carregarTratamentos();
+            } catch(e) {
+                console.error('Erro:', e);
+                alert('Erro ao salvar consulta');
+            }
+        };
+
+        async function deletarConsulta(id) {
+            if(!confirm('Deseja excluir esta consulta?')) return;
+            try {
+                await fetch(`/consultas/${id}`, { method: 'DELETE' });
+                carregarConsultas();
+            } catch(e) {
+                alert('Erro ao deletar consulta');
+            }
+        }
+
+        async function deletarExame(id) {
+            if(!confirm('Deseja excluir este exame?')) return;
+            try {
+                await fetch(`/exames/${id}`, { method: 'DELETE' });
+                carregarConsultas();
+            } catch(e) {
+                alert('Erro ao deletar exame');
+            }
+        }
+
+        // Carregar clientes na inicialização
+        carregarClientes();
+    </script>
+</body>
+</html>
 
         carregar();
     </script>

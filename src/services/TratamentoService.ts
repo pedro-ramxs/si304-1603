@@ -35,4 +35,22 @@ export class TratamentoService {
       include: { consultas: true } 
     });
   }
+
+  async Atualizar_tratamento(id: string, dados: Partial<Omit<Tratamento, 'id' | 'animalId'>>): Promise<Tratamento> {
+    return await prisma.tratamento.update({
+      where: { id },
+      data: dados,
+      include: { consultas: true }
+    });
+  }
+
+  async Deletar_tratamento(id: string): Promise<void> {
+    await prisma.tratamento.delete({ where: { id } });
+  }
+
+  async Listar_todos_tratamentos(): Promise<Tratamento[]> {
+    return await prisma.tratamento.findMany({
+      include: { consultas: true }
+    });
+  }
 }

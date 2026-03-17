@@ -1,5 +1,6 @@
 // 1. IMPORTANTE: Importe a instância que já tem o adaptador, NÃO crie uma nova!
 import { prisma } from '../lib/prisma.js'; 
+import type { Exame } from '@prisma/client';
 
 export class ConsultaRepository {
   // Removido o "const prisma = new PrismaClient()" daqui de dentro!
@@ -12,7 +13,8 @@ export class ConsultaRepository {
         historico,
         tratamentoId, // Ajustado de animalId para tratamentoId conforme sua migration
         veterinarioId,
-      }
+      },
+      include: { exames: true, veterinario: true }
     });
   }
 
@@ -30,7 +32,8 @@ export class ConsultaRepository {
                 animal: true // Para chegar no animal, passamos pelo tratamento
             }
         },
-        veterinario: true
+        veterinario: true,
+        exames: true
       }
     });
   }
@@ -40,7 +43,63 @@ export class ConsultaRepository {
   async atualizarStatus(id: string, historicoNovo: string) {
     return await prisma.consulta.update({
       where: { id },
-      data: { historico: historicoNovo }
+      data: { historico: historicoNovo },
+      include: { exames: true, veterinario: true }
     });
+  }
+
+  async buscarPorId(id: string) {
+    return await prisma.consulta.findUnique({
+      where: { id },
+      include: { exames: true, veterinario: true }
+    });
+  }
+
+  async listarPorTratamento(tratamentoId: string) {
+    return await prisma.consulta.findMany({
+      where: { tratamentoId },
+      include: { exames: true, veterinario: true },
+      orderBy: { data_consulta: 'desc' }
+    });
+  }
+
+  async listarTodas() {
+    return await prisma.consulta.findMany({
+      include: { exames: true, veterinario: true },
+      orderBy: { data_consulta: 'desc' }
+    });
+  }
+
+  async atualizar(id: string, dados: any) {
+    return await prisma.consulta.update({
+      where: { id },
+      data: dados,
+      include: { exames: true, veterinario: true }
+    });
+  }
+
+  async deletar(id: string) {
+    await prisma.consulta.delete({ where: { id } });
+  }
+
+  async criarExame(consultaId: string, descricao: string): Promise<Exame> {
+    return await prisma.exame.create({
+      data: {
+        desc_exame: descricao,
+        consultaId: consultaId
+      }
+    });
+  }
+
+  async buscarExame(id: string) {
+    return await prisma.exame.findUnique({ where: { id } });
+  }
+
+  async listarExames(consultaId: string) {
+    return await prisma.exame.findMany({ where: { consultaId } });
+  }
+
+  async deletarExame(id: string) {
+    await prisma.exame.delete({ where: { id } });
   }
 }

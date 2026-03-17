@@ -4,11 +4,36 @@ import type { Cliente, Animal } from '@prisma/client';
 export class ClienteService {
   async Registrar_cliente(dados: Omit<Cliente, 'id'>): Promise<string> {
     const cliente = await prisma.cliente.create({ data: dados });
-    return cliente.id; // Retorna o ID (int/uuid conforme schema)
+    return cliente.id;
   }
 
   async Consultar_cliente(email: string): Promise<Cliente | null> {
     return await prisma.cliente.findUnique({ where: { email } });
+  }
+
+  async Buscar_cliente_por_id(id: string): Promise<Cliente | null> {
+    return await prisma.cliente.findUnique({ 
+      where: { id },
+      include: { animais: true }
+    });
+  }
+
+  async Listar_clientes(): Promise<Cliente[]> {
+    return await prisma.cliente.findMany({
+      include: { animais: true }
+    });
+  }
+
+  async Atualizar_cliente(id: string, dados: Partial<Omit<Cliente, 'id'>>): Promise<Cliente> {
+    return await prisma.cliente.update({
+      where: { id },
+      data: dados,
+      include: { animais: true }
+    });
+  }
+
+  async Deletar_cliente(id: string): Promise<void> {
+    await prisma.cliente.delete({ where: { id } });
   }
 
   async Vis_animal(clienteId: string): Promise<Animal[]> {
@@ -33,5 +58,24 @@ export class ClienteService {
       
       return animal;
     });
+  }
+
+  async Buscar_animal_por_id(id: string): Promise<Animal | null> {
+    return await prisma.animal.findUnique({
+      where: { id },
+      include: { tratamentos: true }
+    });
+  }
+
+  async Atualizar_animal(id: string, dados: Partial<Omit<Animal, 'id' | 'clienteId'>>): Promise<Animal> {
+    return await prisma.animal.update({
+      where: { id },
+      data: dados,
+      include: { tratamentos: true }
+    });
+  }
+
+  async Deletar_animal(id: string): Promise<void> {
+    await prisma.animal.delete({ where: { id } });
   }
 }
