@@ -1,0 +1,74 @@
+datasource db {
+  provider = "sqlite"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Cliente {
+  id        String   @id @default(uuid())
+  nome      String
+  endereco  String
+  telefone  String
+  cep       String
+  email     String   @unique
+  animais   Animal[]
+}
+
+model Animal {
+  id             String       @id @default(uuid())
+  nome           String
+  idade          Int
+  sexo           Int          // Conforme sua regra (ex: 1-M, 2-F)
+  clienteId      String
+  cliente        Cliente      @relation(fields: [clienteId], references: [id])
+  
+  // Campo oposto obrigatório para a relação com Tratamento
+  tratamentos    Tratamento[] 
+}
+
+model Tratamento {
+  id              String     @id @default(uuid())
+  data_inicial    DateTime
+  data_final      DateTime?
+  nome_tratamento String?
+  
+  animalId        String
+  animal          Animal     @relation(fields: [animalId], references: [id])
+  
+  // Campo da relação com Consulta
+  consultas       Consulta[]
+}
+
+model Consulta {
+  id            String     @id @default(uuid())
+  data_consulta DateTime
+  historico     String
+  
+  tratamentoId  String
+  tratamento    Tratamento @relation(fields: [tratamentoId], references: [id])
+  
+  // Campo oposto obrigatório para a relação com Exame
+  exames        Exame[]
+  
+  // Se houver relação com Veterinário conforme sua regra:
+  veterinarioId String?
+  veterinario   Veterinario? @relation(fields: [veterinarioId], references: [id])
+}
+
+model Veterinario {
+  id            String     @id @default(uuid())
+  nome_vet      String
+  endereco_vet  String
+  telefone_vet  String
+  consultas     Consulta[]
+}
+
+model Exame {
+  id          String   @id @default(uuid())
+  desc_exame  String
+  
+  consultaId  String
+  consulta    Consulta @relation(fields: [consultaId], references: [id])
+}

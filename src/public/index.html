@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>VetSys - Gestão Veterinária</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 pb-10">
+    <nav class="bg-blue-700 p-4 text-white shadow-md mb-8">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold italic tracking-tighter">🐾 VET-SISTEMA v1.0</h1>
+            <div class="space-x-4">
+                <button onclick="document.getElementById('modal-cliente').classList.toggle('hidden')" class="bg-white text-blue-700 px-4 py-2 rounded-lg font-bold hover:bg-blue-50 transition">+ Novo Cliente</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 px-4">
+        <div class="lg:col-span-2 space-y-4" id="lista-clientes">
+            </div>
+
+        <div class="space-y-4">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 text-center">
+                <h3 class="text-gray-500 uppercase text-xs font-bold tracking-widest mb-2">Total de Pacientes</h3>
+                <span id="total-pets" class="text-5xl font-black text-blue-600">0</span>
+            </div>
+        </div>
+    </main>
+
+    <div id="modal-cliente" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl">
+            <h2 class="text-2xl font-bold mb-6">Cadastrar Novo Cliente</h2>
+            <form id="form-cliente" class="space-y-4">
+                <input type="text" name="nome" placeholder="Nome Completo" class="w-full p-3 border rounded-xl" required>
+                <input type="email" name="email" placeholder="E-mail" class="w-full p-3 border rounded-xl" required>
+                <input type="text" name="telefone" placeholder="Telefone" class="w-full p-3 border rounded-xl" required>
+                <input type="text" name="endereco" placeholder="Endereço" class="w-full p-3 border rounded-xl" required>
+                <div class="flex gap-2">
+                    <button type="button" onclick="document.getElementById('modal-cliente').classList.add('hidden')" class="flex-1 p-3 bg-gray-200 rounded-xl">Cancelar</button>
+                    <button type="submit" class="flex-1 p-3 bg-blue-600 text-white rounded-xl font-bold">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API = ''; // URL base
+
+        async function carregar() {
+            const res = await fetch('/clientes');
+            const clientes = await res.json();
+            const container = document.getElementById('lista-clientes');
+            let totalPets = 0;
+            
+            container.innerHTML = clientes.map(c => {
+                totalPets += c.animais.length;
+                return `
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-start">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">${c.nome}</h3>
+                            <p class="text-gray-500 text-sm">${c.email} | ${c.telefone}</p>
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                ${c.animais.length > 0 ? c.animais.map(a => `
+                                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-200">
+                                        🐶 ${a.nome} (${a.idade} anos)
+                                    </span>
+                                `).join('') : '<span class="text-gray-400 text-xs italic">Nenhum animal cadastrado</span>'}
+                            </div>
+                        </div>
+                        <button onclick="excluir('${c.id}')" class="text-red-400 hover:text-red-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('total-pets').innerText = totalPets;
+        }
+
+        document.getElementById('form-cliente').onsubmit = async (e) => {
+            e.preventDefault();
+            const data = Object.fromEntries(new FormData(e.target));
+            data.cep = "00000-000"; // Campo obrigatório no schema
+            
+            await fetch('/clientes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            e.target.reset();
+            document.getElementById('modal-cliente').classList.add('hidden');
+            carregar();
+        };
+
+        async function excluir(id) {
+            if(confirm('Deseja excluir este cliente?')) {
+                await fetch(`/clientes/\${id}`, { method: 'DELETE' });
+                carregar();
+            }
+        }
+
+        carregar();
+    </script>
+</body>
+</html>
